@@ -1,0 +1,34 @@
+{
+  "name": "MYOB AccountRight",
+  "slug": "myob-accountright",
+  "url": "http://myob.com.au/products/small-business/accounting-software/myob-accountright-1422735752948",
+  "settings": [{
+    "key": "consumerKey",
+    "type": "text",
+    "description": "Consumer Token",
+    "for_types": ["Public"],
+    "required": true
+  }, {
+    "key": "consumerSecret",
+    "type": "text",
+    "description": "Consumer Secret",
+    "for_types": ["Public"],
+    "required": true
+  }],
+  "auth_types": {
+    "Public": {
+      "setup_help": "./samples/getting_started.md",
+      "requires_signing": true
+    }
+  },
+  "samples": {
+    "getting_started": "./samples/getting-started.js"
+  },
+  "endpoints": {
+    "Query": {
+      "sample": "./samples/endpoints/query.js",
+      "docs": "https://developer.intuit.com/docs/0100_accounting/0300_developer_guides/querying_data",
+      "subscribe": false
+    }
+  }
+}
