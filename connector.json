@@ -3,15 +3,15 @@
   "slug": "myob-accountright",
   "url": "http://myob.com.au/products/small-business/accounting-software/myob-accountright-1422735752948",
   "settings": [{
-    "key": "consumerKey",
+    "key": "clientId",
     "type": "text",
-    "description": "Consumer Token",
+    "description": "API Key",
     "for_types": ["Public"],
     "required": true
   }, {
-    "key": "consumerSecret",
+    "key": "clientSecret",
     "type": "text",
-    "description": "Consumer Secret",
+    "description": "API Secret",
     "for_types": ["Public"],
     "required": true
   }],
@@ -25,9 +25,14 @@
     "getting_started": "./samples/getting-started.js"
   },
   "endpoints": {
-    "Query": {
-      "sample": "./samples/endpoints/query.js",
-      "docs": "https://developer.intuit.com/docs/0100_accounting/0300_developer_guides/querying_data",
+    "CompanyFiles": {
+      "sample": "./samples/endpoints/companyfiles.js",
+      "docs": "http://developer.myob.com/api/accountright/v2/company-files/",
+      "subscribe": false
+    },
+    "Contact": {
+      "sample": "./samples/endpoints/contact.js",
+      "docs": "http://developer.myob.com/api/accountright/v2/contact/",
       "subscribe": false
     }
   }

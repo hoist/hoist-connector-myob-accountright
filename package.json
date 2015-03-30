@@ -41,6 +41,7 @@
     "moment": "^2.8.4",
     "node-uuid": "^1.4.2",
     "oauth": "git://github.com/hoist/node-oauth",
+    "request-promise": "^0.4.1",
     "validator": "^3.22.2",
     "xml2js": "^0.4.4"
   }

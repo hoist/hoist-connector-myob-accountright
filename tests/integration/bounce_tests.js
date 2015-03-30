@@ -1,16 +1,19 @@
 'use strict';
+require('../bootstrap');
 var Connector = require('../../lib/connector');
 var BBPromise = require('bluebird');
 var config = require('config');
-describe.skip('bounce flow', function () {
+var expect = require('chai').expect;
+describe('bounce flow', function () {
   var connector;
   before(function () {
     connector = new Connector({
-      clientId: config.get('clientId'),
-      clientSecret: config.get('clientSecret')
+      clientId: config.get('ClientId'),
+      clientSecret: config.get('ClientSecret')
     });
   });
   describe('initial bounce', function () {
+    var _redirect;
     before(function () {
       var bounce = {
         get: function () {
@@ -25,6 +28,7 @@ describe.skip('bounce flow', function () {
         },
         redirect: function () {
           console.log('redirect', arguments);
+          _redirect = arguments[0];
           return BBPromise.resolve(null);
         },
         done: function () {
@@ -38,14 +42,15 @@ describe.skip('bounce flow', function () {
       });
     });
     it('should do some redirect', function () {
-
+      expect(_redirect).to.eql('https://secure.myob.com/oauth2/account/authorize?scope=CompanyFile&response_type=code&redirect_uri=https%3A%2F%2Fbouncer.hoist.io%2Fbounce&client_id='+config.get('ClientId'));
     });
   });
   describe('get request token bounce', function () {
+    this.timeout(50000);
     before(function () {
       var bounce = {
         query:{
-          code:'ZT3a!IAAAAKIAnJGwyVHVkcC8Dif_4m2M6wAOz_QPLW9s-taiZqRg8QAAAAFt4yjYTrYTg3v0j7bBxgLISlQMrNGSCxHjOGRpH2es6V_zNBH36G5-Iv1U_l97ojyVykIashdMf0opLXqYeF4P2q4JUl1bgV4KyOE6xwqnoyI5rzJO0a55tLPob1MFNu84CHAo8q0NWSkOQIjXYiDKwXVaSYVAULG31VEVpuagUPS8xIQzuIJSACSDF1rvCReZtWxG8SH98wSlvdEKXwEqd8C020_CqvrlcjpChecxAtva-el-rviUdJQkj0oryCMuJ-rJEcntnRJQoHV8qYo2l4hoC2TQ7pf639leIq1Pw_63knOOeUVGSEYpsHodY9E'
+          code:decodeURIComponent('ZT3a%21IAAAAODf-LuIFL38yd_4yyKGiA4TQKF8e7qASxBlxXZXOOxO8QAAAAHC5UrqWidxHyK1be6B7e_6EpehY56kIY3WMuUYNpEam3WOFjN61UPgJVmTxFpG4uUM4L9nj-qnJvQlTFt7cUJvMddVexgXHeKe07FCIM1a0NBnKW_xrJTzcwr8HU8g8P-Ep3XZV_p9Cvb2jwl3fof47CW-AddsewSTEPqMEXAZZTrstRDcvK4ZE3PWZfnMGnt9RgPN-BWJyOJ1AG4f1eqonLRSffc90EYlfqX4mI9M8shw8DUZHSrBHJoW3ZwJDLgdJa0FtLCRt9cPwflZEfsr3kaO2tosdiHZUXCvTsGIO8dIr45QvUWFo2w1pkJAPgM')
         },
         get: function (key) {
           if(key==='requestToken'){
