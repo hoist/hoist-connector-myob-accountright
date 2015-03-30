@@ -5,7 +5,7 @@ var config = require('config');
 var expect = require('chai').expect;
 var BBPromise = require('bluebird');
 describe('MYOBConnector', function () {
-  describe.only('#get /contacts', function () {
+  describe.skip('#get /contacts', function () {
     this.timeout(5000);
     var _getContacts;
     before(function () {

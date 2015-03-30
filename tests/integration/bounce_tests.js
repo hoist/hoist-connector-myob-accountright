@@ -4,7 +4,7 @@ var Connector = require('../../lib/connector');
 var BBPromise = require('bluebird');
 var config = require('config');
 var expect = require('chai').expect;
-describe('bounce flow', function () {
+describe.skip('bounce flow', function () {
   var connector;
   before(function () {
     connector = new Connector({
