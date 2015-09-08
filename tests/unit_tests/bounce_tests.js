@@ -20,7 +20,7 @@ describe('MYOBConnector', function () {
         connector.receiveBounce(mockBounce);
       });
       it('redirects to MYOB auth url', function () {
-        expect(mockBounce.redirect).to.have.been.calledWith('https://secure.myob.com.runscope.net/oauth2/account/authorize?scope=CompanyFile&response_type=code&redirect_uri=https%3A%2F%2Fbouncer.hoist.io%2Fbounce&client_id=clientId');
+        expect(mockBounce.redirect).to.have.been.calledWith('https://secure.myob.com/oauth2/account/authorize?scope=CompanyFile&response_type=code&redirect_uri=https%3A%2F%2Fbouncer.hoist.io%2Fbounce&client_id=clientId');
       });
       it('sets requestToken to be true', function () {
         expect(mockBounce.set).to.have.been.calledWith('requestToken', true);
