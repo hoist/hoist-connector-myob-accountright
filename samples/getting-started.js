@@ -2,7 +2,7 @@
 
 
 
-module.exports = function (req, res, done) {
+module.exports = function (event, done) {
   var MYOB = Hoist.connector("<key>");
   return MYOB.authorize("<bouncerToken>").then(function () {
     //only call this once per authorization/bucket
@@ -13,8 +13,6 @@ module.exports = function (req, res, done) {
         return Hoist.event.raise('CONTACTS:FOUND', {
           count: ContactsResponse.Items.length
         });
-      }).then(function () {
-        done();
       });
   });
 };
