@@ -1,7 +1,7 @@
 /* Just copy and paste this snippet into your code */
 
 
-
+/* either return a promise or call done, here we're returning a promise */
 module.exports = function (event, done) {
   var MYOB = Hoist.connector("<key>");
   return MYOB.authorize("<bouncerToken>").then(function () {
