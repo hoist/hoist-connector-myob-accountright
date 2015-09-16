@@ -3,7 +3,7 @@
     "domains": {
       "bouncer": "bouncer.hoist.io"
     }
-  }
+  },
   "consumerKey": "CONSUMER KEY HERE",
   "consumerSecret": "CONSUMER SECRET HERE"
 }
