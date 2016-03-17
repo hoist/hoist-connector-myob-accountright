@@ -6,7 +6,21 @@ var expect = require('chai').expect;
 var BBPromise = require('bluebird');
 describe('MYOBConnector', function () {
 
-
+  describe('connector', function () {
+    var _connector;
+    before(function () {
+      _connector = new MYOBConnector({
+        clientId: 'clientId',
+        clientSecret: 'clientSecret'
+      });
+    });
+    it('exposes authorize', function () {
+      return expect(Object.getOwnPropertyNames(Object.getPrototypeOf(_connector))).to.contain('authorize');
+    });
+    it('exposes setUsernameAndPassword', function () {
+      return expect(Object.getOwnPropertyNames(Object.getPrototypeOf(_connector))).to.contain('setUsernameAndPassword');
+    });
+  });
   describe('#get', function () {
     var _connector;
     var _authorization;
@@ -196,7 +210,7 @@ describe('MYOBConnector', function () {
       });
     });
   });
-describe('#delete', function () {
+  describe('#delete', function () {
     var _connector;
     var _authorization;
     var _response = {
