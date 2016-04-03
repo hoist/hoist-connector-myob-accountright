@@ -24,7 +24,7 @@ class EditForm extends C.View {
           }} onSubmit={(evt) => {
             this.props.updateSettings(evt);
           }}>
-            <UI.FormElements.Input placeholder="Key" name="key" label="Key" type="text" value={this.props._key}/>
+            <UI.FormElements.Input inactive={!!(this.props.connectorInstance)} placeholder="Key" name="key" label="Key" type="text" value={this.props._key}/>
             <UI.FormElements.Input placeholder="App Id" name="clientId" label="App Id" type="text" value={this.props.settings.clientId}/>
             <UI.FormElements.Input placeholder="API Key" name="clientSecret" label="API Key" type="text" value={this.props.settings.clientSecret}/>
             <UI.FormElements.Button
@@ -35,7 +35,18 @@ class EditForm extends C.View {
               onClick={this.props.updateSettings} />
           </form>
         </C.Panel>
-        <C.Panel name="instructions" slug="Instructions"></C.Panel>
+        <C.Panel name="Advanced" slug="advanced">
+          <div>
+            <C.PageHeader
+              title="Delete Connector."
+              subTitle="This will delete any user data associated with this connector" />
+            <UI.FormElements.Button
+              loading={this.props.saving}
+              text='Delete'
+              type="large danger"
+              onClick={this.props.deleteConnector} />
+          </div>
+        </C.Panel>
       </C.Page>
     );
   }
