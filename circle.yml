@@ -21,7 +21,7 @@ dependencies:
     - "~/docker"
   override:
     - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-    - docker pull hoist/portal.hoist.io:${CIRCLE_TAG//release\//}${CIRCLE_BRANCH//feature\//}; true;
+    - docker pull hoist/connector-myob-accountright:${CIRCLE_TAG//release\//}${CIRCLE_BRANCH//feature\//}; true;
     - docker build -t hoist/connector-myob-accountright:${CIRCLE_BRANCH//feature\//} .
 test:
   override:
