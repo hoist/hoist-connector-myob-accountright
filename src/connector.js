@@ -1,5 +1,4 @@
 'use strict';
-
 var BBPromise = require('bluebird');
 var OAuth = require('@hoist/oauth').OAuth2;
 var _ = require('lodash');
@@ -8,16 +7,24 @@ var errors = require('@hoist/errors');
 var requestPromise = require('request-promise');
 var config = require('config');
 
+
 function MYOBConnector(settings) {
 
   logger.info({
     settings: settings
   }, 'constructed myob connector');
   this.settings = settings;
-  this.auth = new OAuth(settings.clientId, settings.clientSecret, 'https://secure.myob.com/oauth2/', 'account/authorize', 'v1/authorize');
-  this.auth.getOAuthAccessTokenAsync = BBPromise.promisify(this.auth.getOAuthAccessToken, { multiArgs: true });
+  this.auth = new OAuth(
+    settings.clientId,
+    settings.clientSecret,
+    'https://secure.myob.com/oauth2/',
+    'account/authorize',
+    'v1/authorize'
+  );
+  this.auth.getOAuthAccessTokenAsync = BBPromise.promisify(this.auth.getOAuthAccessToken, {multiArgs:true});
   _.bindAll(this);
 }
+
 
 /* istanbul ignore next */
 MYOBConnector.prototype.authorize = function (authorization) {
@@ -76,22 +83,26 @@ MYOBConnector.prototype._generateUrl = function (path, queryParams) {
 /* istanbul ignore next */
 MYOBConnector.prototype._refreshAccessToken = function () {
   return BBPromise.try(function refreshToken() {
-    var options = {
-      uri: 'https://secure.myob.com/oauth2/v1/authorize',
-      method: 'POST',
-      json: true,
-      form: {
-        'client_id': this.settings.clientId,
-        'client_secret': this.settings.clientSecret,
-        'refresh_token': this.authorization.get('refreshToken'),
-        'grant_type': 'refresh_token'
-      }
-    };
-    return this._rp(options);
-  }, [], this).bind(this).then(function (response) {
-    /* jshint camelcase:false */
-    return BBPromise.all([this.authorization.set('accessToken', response.access_token), this.authorization.set('refreshToken', response.refresh_token)]);
-  });
+      var options = {
+        uri: 'https://secure.myob.com/oauth2/v1/authorize',
+        method: 'POST',
+        json: true,
+        form: {
+          'client_id': this.settings.clientId,
+          'client_secret': this.settings.clientSecret,
+          'refresh_token': this.authorization.get('refreshToken'),
+          'grant_type': 'refresh_token'
+        }
+      };
+      return this._rp(options);
+    }, [], this).bind(this)
+    .then(function (response) {
+      /* jshint camelcase:false */
+      return BBPromise.all([
+        this.authorization.set('accessToken', response.access_token),
+        this.authorization.set('refreshToken', response.refresh_token)
+      ]);
+    });
 };
 MYOBConnector.prototype._request = function (method, path, queryParams, data, optionsToAdd) {
   return BBPromise.try(function makeRequest() {
@@ -133,21 +144,25 @@ MYOBConnector.prototype._request = function (method, path, queryParams, data, op
       options: options
     }, 'making a myob request');
     return this._rp(options);
-  }, [], this).bind(this).catch(function (err) {
+  }, [], this).bind(this)
+
+  .catch(function (err) {
     logger.error(err);
     /* istanbul ignore next */
     if (err.name === 'StatusCodeError' && err.statusCode === 401) {
       logger.info({
         messsage: err.message
       }, "refreshing access token due to StatusCodeError");
-      return this._refreshAccessToken().bind(this).then(function () {
-        return this._request(method, path, queryParams, data);
-      });
+      return this._refreshAccessToken()
+        .bind(this).then(function () {
+          return this._request(method, path, queryParams, data);
+        });
     } else {
       logger.info("error occured");
       throw err;
     }
   });
+
 };
 
 MYOBConnector.prototype.receiveBounce = function (bounce) {
@@ -163,27 +178,31 @@ MYOBConnector.prototype.receiveBounce = function (bounce) {
       logger.info({
         response: [response[0], response[1]]
       }, "got access token response");
-      return BBPromise.all([bounce.set('accessToken', response[0]), bounce.set('refreshToken', response[1])]).bind(this).then(function () {
-        logger.info("getting company file list");
-        return this._rp({
-          method: 'GET',
-          uri: 'https://api.myob.com/accountright/',
-          json: true,
-          headers: {
-            "User-Agent": "Hoist Integration (support@hoist.io)",
-            "Authorization": "Bearer " + response[0],
-            "Content-Type": "application/json",
-            "x-myobapi-key": this.settings.clientId,
-            "x-myobapi-version": "v2"
-          }
-        }).then(function (companyFiles) {
-          logger.info('got company file response');
-          if (companyFiles.length > 0) {
-            logger.info('setting company file id');
-            return bounce.set('fileId', companyFiles[0].Id);
-          }
+      return BBPromise.all([
+          bounce.set('accessToken', response[0]),
+          bounce.set('refreshToken', response[1])
+        ]).bind(this)
+        .then(function () {
+          logger.info("getting company file list");
+          return this._rp({
+            method: 'GET',
+            uri: 'https://api.myob.com/accountright/',
+            json: true,
+            headers: {
+              "User-Agent": "Hoist Integration (support@hoist.io)",
+              "Authorization": "Bearer " + response[0],
+              "Content-Type": "application/json",
+              "x-myobapi-key": this.settings.clientId,
+              "x-myobapi-version": "v2"
+            }
+          }).then(function (companyFiles) {
+            logger.info('got company file response');
+            if (companyFiles.length > 0) {
+              logger.info('setting company file id');
+              return bounce.set('fileId', companyFiles[0].Id);
+            }
+          });
         });
-      });
     }).then(function () {
       return bounce.done();
     });
@@ -191,16 +210,19 @@ MYOBConnector.prototype.receiveBounce = function (bounce) {
     /* First hit */
     /*jshint camelcase: false */
     logger.info("getting request token");
-    return bounce.set('requestToken', true).bind(this).then(function () {
-      logger.info("redirecting user to myob");
-      bounce.redirect(this.auth.getAuthorizeUrl({
-        scope: 'CompanyFile',
-        response_type: 'code',
-        redirect_uri: 'https://' + config.get('Hoist.domains.bouncer') + '/bounce'
-      }));
-    });
+    return bounce.set('requestToken', true)
+      .bind(this)
+      .then(function () {
+        logger.info("redirecting user to myob");
+        bounce.redirect(this.auth.getAuthorizeUrl({
+          scope: 'CompanyFile',
+          response_type: 'code',
+          redirect_uri: 'https://' + config.get('Hoist.domains.bouncer') + '/bounce'
+        }));
+      });
   }
+
 };
 
+
 module.exports = MYOBConnector;
-//# sourceMappingURL=connector.js.map

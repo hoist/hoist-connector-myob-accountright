@@ -20,10 +20,9 @@ dependencies:
   cache_directories:
     - "~/docker"
   override:
-    - mkdir -p ~/docker
-    - if [[ -e ~/docker/connector-myob-accountright.tar ]]; then docker load -i ~/docker/connector-myob-accountright.tar; fi
+    - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+    - docker pull hoist/connector-myob-accountright:${CIRCLE_TAG//release\//}${CIRCLE_BRANCH//feature\//}; true;
     - docker build -t hoist/connector-myob-accountright:${CIRCLE_BRANCH//feature\//} .
-    - docker save "hoist/connector-myob-accountright" > ~/docker/connector-myob-accountright.tar
 test:
   override:
     - docker kill mongodb; true;
@@ -45,8 +44,6 @@ deployment:
     branch: [master,/feature\/.*/]
     owner: hoist
     commands:
-      - echo ${DOCKER_CONFIG} > .dockercfg
-      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - docker push hoist/connector-myob-accountright:${CIRCLE_BRANCH//feature\//}
 notify:
   webhooks:
